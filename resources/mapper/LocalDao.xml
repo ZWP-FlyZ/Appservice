@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+ 
+ <mapper namespace="com.service.dao.LocalDao">
+ <resultMap type="Data" id="resultListData">
+     <result column="uId" property="uId" />
+     <result column="mark" property="mark" />
+ </resultMap>
+ 
+    <select id="getLocalDataById" parameterType="java.lang.Integer" resultType="Data">
+        select * from `data` where uId = #{uId}
+    </select>
+    
+    <insert id="insertLocalData" parameterType="Data" > 
+        insert into `data` (uId,mark) values (#{uId},#{mark})
+    </insert>  
+    <select id="getLocalDataListByMark" parameterType="java.lang.String"  resultMap="resultListData">
+        select * from `data`  where mark like #{likeStr}
+    </select>
+       
+</mapper>
