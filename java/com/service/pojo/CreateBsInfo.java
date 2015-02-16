@@ -1,10 +1,12 @@
 package com.service.pojo;
 
+
 public class CreateBsInfo extends CommonInfo {
+	private String bstype;
 	private String theme;
 	private String body;
 	private String nickName;
-	
+	private Integer bsId;
 	
 	public CreateBsInfo(String cmdKind, String receiveFrom, String sendTo) {
 		super(cmdKind, receiveFrom, sendTo);
@@ -35,6 +37,21 @@ public class CreateBsInfo extends CommonInfo {
 		this.nickName = nickName;
 	}
 
-	
+	public String getBstype() {
+		return bstype;
+	}
+
+	public void setBstype(String bstype) {
+		this.bstype = bstype;
+	}
+
+	public Integer getBsId() {
+		return bsId;
+	}
+
+	public void setBsId(Integer bsId) {
+		this.bsId = bsId;
+	}
+
 
 }

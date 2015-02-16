@@ -7,16 +7,319 @@
      <result column="uId" property="uId" />
      <result column="mark" property="mark" />
  </resultMap>
- 
+  
+  
+  <resultMap type="BsThemeData" id="bsthemeresultmap">
+	   <result column="bs_Theme" property="theme" />
+	   <result column="bs_Anickname" property="nickname" />
+	   <result column="bs_Time" property="timestamp" />
+	   <result column="bs_RelyC" property="talksC" />
+	   <result column="bs_LikeC" property="LikeC" />
+	   <result column="bs_Id" property="bsid" />
+  </resultMap>
+  
+   <resultMap type="BsReplyData" id="bsreplysultmap">
+	   <result column="br_U_nickname" property="body" />
+	   <result column="br_Body" property="nickname" />
+  </resultMap>
+  
+   <cache eviction="FIFO" flushInterval="60000" size="512" readOnly="true" />
     <select id="getLocalDataById" parameterType="java.lang.Integer" resultType="Data">
         select * from `data` where uId = #{uId}
     </select>
-    
     <insert id="insertLocalData" parameterType="Data" > 
         insert into `data` (uId,mark) values (#{uId},#{mark})
     </insert>  
+   
     <select id="getLocalDataListByMark" parameterType="java.lang.String"  resultMap="resultListData">
         select * from `data`  where mark like #{likeStr}
     </select>
-       
+    
+    
+    <select id="checkUserName" resultType="java.lang.Integer">
+    	select count(u_NickHash) from 
+       (select u_NickHash from userInfoLocal where u_NickHash = #{hashcode,jdbcType=INTEGER}) as tmp
+    </select>
+    
+    <select id="count" resultType="java.lang.Integer">
+         select count(*) from ${tbname}
+    </select> 
+    
+    <select id="getLogInData" resultType="com.service.model.LogInData">
+        select u_Id,u_Password from userInfoLocal where u_NickHash = #{hashcode,jdbcType=INTEGER}
+    </select>  
+    
+    
+    <select id="getPerDataLoc" resultType="com.service.model.PerDataLoc">
+       select u_MajorTimes,u_NeedMatchTimes,u_MarkTimes,u_NickName,u_Marks,u_NeedMatch
+        from userInfoLocal where u_Id = #{uid,jdbcType=INTEGER}
+    </select>
+    
+    <select id="getPerDataLocS" resultType="com.service.model.PerDataLocS">
+     select  t2.u_Sign,t1.u_Contact from 
+          (select u_Contact ,u_Id from userContact where userContact.u_Id = #{uid,jdbcType=INTEGER}) as t1 
+    left  join 
+          (select u_Sign,u_Id from userSign where userSign.u_Id = #{uid,jdbcType=INTEGER}) as t2 
+    on    t1.u_Id=t2.u_Id;
+    </select>
+    
+     <select id="getMsgCache" resultType="java.lang.String">
+       select u_Msg from MessageCache2 
+          where u_Id = #{uid,jdbcType=INTEGER}
+     </select>
+      <select id="searchNewBs" resultMap="bsthemeresultmap">
+      select 
+      		bs_LikeC,bs_RelyC,bs_Id,unix_timestamp(bs_Time) as bs_Time,bs_Anickname,bs_Theme
+      from ${bstype}
+      order by bs_Id desc
+      limit 10
+      </select>
+      
+      <select id="searchBs" resultMap="bsthemeresultmap">
+	      select 
+	         bs_LikeC,bs_RelyC,bs_Id,unix_timestamp(bs_Time) as bs_Time,bs_Anickname,bs_Theme
+	      from ${bstype}
+	      where bs_Id  &lt; #{bsid,jdbcType=INTEGER}
+	      order by bs_Id desc
+	      limit 10
+      </select>
+      
+      <select id="getBsBody" resultType="java.lang.String">
+       select bd_Msg from ${bstypeBody}
+       				where bs_Id = #{bsid,jdbcType=INTEGER}
+      </select>
+      <select id="lookBs" resultMap="bsreplysultmap">
+       select br_U_nickname,br_Body from ${bstypeReply}
+             where br_Bs_Id = #{bsid,jdbcType=INTEGER}
+      </select>
+      
+      <select id="isContainBBs" resultType="int">
+      select count(BBs_Name) from BBsNames where BBs_Name like #{bsNameLike,jdbcType=VARCHAR}
+      </select>
+      
+    <insert id="insertUserInfo">
+    	insert into userInfoLocal 
+    	   (u_Id,u_NickName,u_Password,u_NickHash)
+    	  <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="uid != null" >
+        #{uid,jdbcType=INTEGER},
+      </if>
+      <if test="nickname != null" >
+        #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="uid != null" >
+        #{hashcode,jdbcType=INTEGER},
+      </if>
+    </trim>
+    </insert>  
+    
+   
+    <insert id="chaPerDataSign">
+       insert into userSign
+       (u_Sign,u_Id)
+      <trim prefix="values (" suffix=")" suffixOverrides="," >
+	        #{sign,jdbcType=VARCHAR},
+	      <if test="uid != null">
+	       #{uid,jdbcType=INTEGER},
+	      </if>     
+      </trim>
+      ON DUPLICATE KEY UPDATE u_Sign = #{sign,jdbcType=VARCHAR}
+    </insert>
+    
+    <insert id="chaPerDataCont">
+       insert into userContact
+       (u_Contact,u_Id)
+      <trim prefix="values (" suffix=")" suffixOverrides="," >
+	      #{contact,jdbcType=VARCHAR},
+	      <if test="uid != null">
+	       #{uid,jdbcType=INTEGER},
+	      </if>     
+      </trim>
+      ON DUPLICATE KEY UPDATE u_Contact = #{contact,jdbcType=VARCHAR}
+    </insert>
+    
+    <insert id="addMsgCache2">
+     insert into MessageCache2
+       (u_Msg,u_Id)
+      <trim prefix="values (" suffix=")" suffixOverrides="," >
+	      #{appendMsg},
+	      <if test="uid != null">
+	       #{uid,jdbcType=INTEGER},
+	      </if>     
+      </trim>
+      ON DUPLICATE KEY UPDATE u_Msg = CONCAT_WS(':',u_Msg,#{appendMsg})
+    </insert>
+    
+    <insert id="insertBsName">
+    	insert into BBsNames (BBs_Name)
+    		values (#{bsName,jdbcType=VARCHAR})
+    	ON DUPLICATE KEY UPDATE  BBs_Name = #{bsName,jdbcType=VARCHAR}
+    </insert>
+    
+    
+    <insert id="addBsMain" parameterType="com.service.pojo.CreateBsInfo"  
+               useGeneratedKeys="true" keyProperty="bsId">
+      insert into ${bstype}  
+            (bs_Auid,bs_Anickname,bs_Theme) 
+	      <trim prefix="values (" suffix=")" suffixOverrides="," >
+	         <if test="receiveFrom != null">
+	         #{receiveFrom,jdbcType=INTEGER},
+	         </if>
+		      <if test="nickName != null">
+		       #{nickName,jdbcType=VARCHAR},
+		      </if>
+		       <if test="theme != null">
+		       #{theme,jdbcType=VARCHAR},
+		      </if>      
+	      </trim> 
+     </insert>
+    
+    <insert id="addBsBody">
+    insert into ${bstypeBody} 
+         (bd_Msg,bs_Id)
+      <trim prefix="values (" suffix=")" suffixOverrides="," >
+		      <if test="msg != null">
+		       #{msg,jdbcType=VARCHAR},
+		      </if>
+		       <if test="bsid != null">
+		       #{bsid,jdbcType=INTEGER},
+		      </if>      
+	  </trim>    
+    </insert>
+    
+    <insert id="replyBs">  
+    insert into ${bstypeReply} 
+     (br_Bs_Id,br_U_id,br_U_nickname,br_Body)
+     <trim prefix="values (" suffix=")" suffixOverrides="," >
+		      <if test="bsid != null">
+		       #{bsid,jdbcType=INTEGER},
+		      </if>
+		       <if test="uid != null">
+		       #{uid,jdbcType=INTEGER},
+		      </if>
+		      <if test="nickname != null">
+		       #{nickname,jdbcType=VARCHAR},
+		      </if>
+		      <if test="msg != null">
+		       #{msg,jdbcType=VARCHAR},
+		      </if>      
+	  </trim>    
+    </insert>
+    
+    
+    <update id="chaPerDataLoc">
+    	update userInfoLocal 
+        <set>
+          <if test="nickname != null" >
+        	u_NickName = #{nickname,jdbcType=VARCHAR},
+         </if>
+         <if test="majorTimes != null" >
+        	u_MajorTimes = #{majorTimes,jdbcType=INTEGER},
+      	 </if>
+      	 <if test="needTimes != null" >
+        	u_NeedMatchTimes = #{needTimes,jdbcType=INTEGER},
+      	 </if>
+      	 <if test="marksTimes != null" >
+        	u_MarkTimes = #{marksTimes,jdbcType=INTEGER},
+      	 </if>
+      	  <if test="marks != null" >
+        	u_Marks = #{marks,jdbcType=VARCHAR},
+         </if>
+          <if test="needMatch != null" >
+        	u_NeedMatch = #{needMatch,jdbcType=VARCHAR},
+         </if>
+        </set>
+        where u_Id = #{uid,jdbcType=INTEGER}
+    </update>
+    
+    <update id="createBsMain">
+    	CREATE TABLE IF NOT EXISTS ${bstype} (
+  `bs_LikeC` SMALLINT NOT NULL DEFAULT 0,
+  `bs_RelyC` SMALLINT NOT NULL DEFAULT 0,
+  `bs_Id` INT NOT NULL AUTO_INCREMENT,
+  `bs_Auid` INT NOT NULL,
+  `bs_Time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `bs_Anickname` VARCHAR(20) NULL,
+  `bs_Theme` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`bs_Id`))
+  ENGINE = InnoDB;
+    </update>
+    
+    <update id="createBsBody">
+    CREATE TABLE IF NOT EXISTS ${bstypeBody} (
+  `bd_Id` INT NOT NULL AUTO_INCREMENT,
+  `bd_Msg` VARCHAR(200) NOT NULL,
+  `bs_Id` INT NOT NULL,
+  PRIMARY KEY (`bd_Id`),
+  UNIQUE INDEX `bs_Id_UNIQUE` (`bs_Id` ASC))
+  ENGINE = InnoDB;
+    </update>
+    
+    <update id="createBsReply">
+    	CREATE TABLE IF NOT EXISTS  ${bstypeReply} (
+  `br_Id` INT NOT NULL AUTO_INCREMENT,
+  `br_Bs_Id` INT NOT NULL,
+  `br_U_id` INT NOT NULL,
+  `br_Time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `br_U_nickname` VARCHAR(20) NOT NULL,
+  `br_Body` VARCHAR(256) NOT NULL,
+  PRIMARY KEY (`br_Id`))
+  ENGINE = InnoDB;
+    </update>
+     
+     <update id="replyBsAdd">
+     	update ${bstype} 
+     	 <set>
+     	 	<if test="bsid!=null">
+     	 	bs_RelyC=bs_RelyC+1
+     	 	</if>
+     	 </set>
+     	 where bs_Id = #{bsid,jdbcType=INTEGER}
+     </update>
+     
+      
+    <update id="likeBs">
+    	update ${bstype} 
+     	 <set>
+     	 	<if test="bsid!=null">
+     	 	bs_LikeC=bs_LikeC+1
+     	 	</if>
+     	 </set>
+     	 where bs_Id = #{bsid,jdbcType=INTEGER}
+    </update>  
+     
+     <update id="calLikeBs">
+    	update ${bstype} 
+     	 <set>
+     	 	<if test="bsid!=null">
+     	 	bs_LikeC=bs_LikeC-1
+     	 	</if>
+     	 </set>
+     	 where bs_Id = #{bsid,jdbcType=INTEGER}
+    </update>
+      
+      
+    <delete id="delMsgCache">
+     delete from MessageCache2  
+     	where u_Id = #{uid,jdbcType=INTEGER}
+    </delete>
+    
+    <delete id="deleteBsMain" >
+      delete from ${bstype} 
+           where bs_Id=#{bsid,jdbcType=INTEGER}
+    </delete>
+    
+    <delete id="deleteBsBody">
+     delete from ${bstypeBody} 
+           where bs_Id=#{bsid,jdbcType=INTEGER}     
+    </delete>
+    
+    <delete id="deleteBsReply">
+     delete from ${bstypeReply} 
+           where br_Bs_Id =#{bsid,jdbcType=INTEGER}
+    </delete>
+    
 </mapper>

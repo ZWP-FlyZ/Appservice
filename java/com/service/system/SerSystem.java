@@ -1,9 +1,9 @@
 package com.service.system;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.service.broadcast.MyBroadCast;
+import com.service.cache.BsCountImp;
 import com.service.dbservice.LocalDbService;
 import com.service.dbservice.RemoteDbService;
 import com.service.netty.MyChannelGroup;
@@ -23,6 +23,7 @@ public class SerSystem {
 	private 	static MyChannelGroup 	channelGroup;
 	private 	static MyThreadPool		threadPool;
 	private 	static MyThreadPool		threadPoolChat;
+	private     static BsCountImp    	bsCount;
 	
 	private SerSystem(){};
 	
@@ -36,7 +37,14 @@ public class SerSystem {
 		SerSystem.scheduler = scheduler;
 	}
 
-
+	public static BsCountImp getBsCount() {
+		return bsCount;
+	}
+	
+	 @Autowired
+	public  void setBsCount(BsCountImp bsCount) {
+		SerSystem.bsCount = bsCount;
+	}
 
 	public static MyBroadCast getBroadCast() {
 		return broadCast;

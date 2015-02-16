@@ -17,6 +17,130 @@
     </insert>  
     <select id="getRemoteDataListByMark" parameterType="java.lang.String"  resultMap="resultListData">
         select * from `data`  where mark like #{likeStr}
+    </select>  
+    
+   
+    
+    
+    <select id="getPerDataRem" resultType="com.service.model.PerDataRem">
+       select u_Sex,u_School,u_Year,u_Major
+        from userInfoRemote where u_Id = #{uid,jdbcType=INTEGER}
     </select>
-       
+    
+    <select id="getPerDataRemS" resultType="com.service.model.PerDataRemS">
+    select  t2.u_AddrBud , t2.u_AddrRoom,t1.u_BirDay from 
+   (select u_BirDay ,u_Id from userBir where userBir.u_Id = #{uid,jdbcType=INTEGER}) as t1 
+    left  join (select u_AddrBud, u_AddrRoom,u_Id from userAddr where userAddr.u_Id = #{uid,jdbcType=INTEGER}) as t2 on t1.u_Id=t2.u_Id;
+    </select>
+    
+    
+    <select id="isConRelation" resultType="java.lang.Integer">
+      select count(t_Name) from RelationTabs 
+          where t_Name like #{RelTypeLike,jdbcType=VARCHAR}
+    </select>
+    
+    <update id="creRelationTabForMarks">
+        CREATE TABLE IF NOT EXISTS  ${MarkName}(
+           `u_Id` INT NOT NULL,
+  			PRIMARY KEY (`u_Id`))
+			ENGINE = InnoDB;
+    </update>
+     
+     <update id="creRelationTabForStr">
+       CREATE TABLE IF NOT EXISTS ${relation} (
+  		`u_Id` INT NOT NULL,
+  		`u_Id_Out` VARCHAR(550) NULL DEFAULT NULL,
+  		PRIMARY KEY (`u_Id`))
+		ENGINE = InnoDB;
+    </update>
+    
+    <update id="creRelationTabForInt">
+      CREATE TABLE IF NOT EXISTS ${relation} (
+  		`r_Id` INT NOT NULL AUTO_INCREMENT,
+  		`u_Id_In` INT NOT NULL,
+ 		 `u_Id_Out` INT NOT NULL,	
+ 		 PRIMARY KEY (`r_Id`))
+		ENGINE = InnoDB;
+    </update>
+     
+     
+      <insert id="insertUserInfo">
+    	insert into userInfoRemote 
+    	   (u_Id,u_NickName,u_Sex,u_Year,u_School,u_Major)
+    	  <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="uid != null" >
+        #{uid,jdbcType=INTEGER},
+      </if>
+      <if test="nickname != null" >
+        #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=VARCHAR},
+      </if>
+       <if test="year != null" >
+        #{year},
+      </if>
+       <if test="school != null" >
+        #{school,jdbcType=VARCHAR},
+      </if>
+       <if test="major != null" >
+        #{major,jdbcType=VARCHAR},
+      </if> 
+    </trim>
+    </insert>  
+    
+    <update id="chaPerDataRem">
+    	update userInfoRemote 
+        <set>
+          <if test="nickname != null" >
+        	u_NickName = #{nickname,jdbcType=VARCHAR},
+         </if>
+         <if test="sex != null" >
+        	u_Sex = #{sex,jdbcType=VARCHAR},
+      	 </if>
+      	  <if test="year != null" >
+        	u_Year = #{year,jdbcType=VARCHAR},
+         </if>
+          <if test="school != null" >
+        	u_School = #{school,jdbcType=VARCHAR},
+         </if>
+          <if test="major != null" >
+        	u_Major = #{major,jdbcType=VARCHAR},
+         </if>
+        </set>
+        where u_Id = #{uid,jdbcType=INTEGER}
+    </update>
+    
+    <insert id="chaPerDataBri">
+       insert into userBir
+       (u_BirDay,u_Id)
+      <trim prefix="values (" suffix=")" suffixOverrides="," >
+	        #{briday,jdbcType=VARCHAR},
+	      <if test="uid != null">
+	       #{uid,jdbcType=INTEGER},
+	      </if>     
+      </trim>
+      ON DUPLICATE KEY UPDATE u_BirDay = #{briday,jdbcType=VARCHAR}
+    </insert>
+     
+    <insert id="chaPerDataAddr">
+       insert into userAddr
+       (u_AddrBud,u_AddrRoom,u_Id)
+      <trim prefix="values (" suffix=")" suffixOverrides="," >
+	        #{addrbuid,jdbcType=VARCHAR},
+	        #{addrroom,jdbcType=VARCHAR},
+	      <if test="uid != null">
+	       #{uid,jdbcType=INTEGER},
+	      </if>     
+      </trim>
+      ON DUPLICATE KEY UPDATE 
+         u_AddrBud = #{addrbuid,jdbcType=VARCHAR},
+         u_AddrRoom = #{addrroom,jdbcType=VARCHAR}
+    </insert>
+    
+    <insert id="insertRelation">
+    	insert ignore into RelationTabs (t_name) values (#{relationName,jdbcType=VARCHAR})
+    </insert>
+    
+    
 </mapper>

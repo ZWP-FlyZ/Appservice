@@ -2,9 +2,9 @@ package com.service.handlers;
 
 import com.service.pojo.UserInfo;
 
-public class ContactTask extends CommonTask{
+public class CcontactTask extends CommonTask{
 
-	public ContactTask(UserInfo info) {
+	public CcontactTask(UserInfo info) {
 		super(info);
 		// TODO Auto-generated constructor stub
 	}

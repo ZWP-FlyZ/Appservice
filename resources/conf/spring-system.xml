@@ -22,5 +22,6 @@
          <bean id="workerGroup"  class="io.netty.channel.nio.NioEventLoopGroup"/>
          <bean id="myChannelGroup"  class="com.service.netty.MyChannelGroup"/>
          <bean id="nettyService" class="com.service.netty.NettyServiceImp"/> 
-   
+          <bean id="bsCount" class="com.service.cache.BsCountImp"/>
+          
       </beans>

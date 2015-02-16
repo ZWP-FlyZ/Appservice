@@ -11,5 +11,5 @@
    
    
     <bean id = "serSystem" class="com.service.system.SerSystem" ></bean>
-     
+    <bean id = "initSystem" class="com.service.system.InitSystem"  init-method="StartUp"></bean> 
    </beans>

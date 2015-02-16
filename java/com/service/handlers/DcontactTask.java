@@ -1,14 +1,12 @@
 package com.service.handlers;
 
-import org.apache.log4j.Logger;
-
 import com.service.pojo.UserInfo;
 
-public class MatchTask extends CommonTask{
+public class DcontactTask extends CommonTask{
 
-	public MatchTask(UserInfo info) {
+	public DcontactTask(UserInfo info) {
 		super(info);
-		logger = Logger.getLogger(MatchTask.class);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override

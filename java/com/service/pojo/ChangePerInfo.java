@@ -12,7 +12,8 @@ public class ChangePerInfo extends CommonInfo{
 	private String sign;
 	private String briday;
 	private String contact;
-	private String addr;
+	private String addrbuid;
+	private String addrrooom;
 	private String selfMark;
 	private String selfTimes;
 	private String otherMark;
@@ -97,14 +98,6 @@ public class ChangePerInfo extends CommonInfo{
 		this.contact = contact;
 	}
 
-	public String getAddr() {
-		return addr;
-	}
-
-	public void setAddr(String addr) {
-		this.addr = addr;
-	}
-
 	public String getSelfMark() {
 		return selfMark;
 	}
@@ -135,6 +128,26 @@ public class ChangePerInfo extends CommonInfo{
 
 	public void setOtherTimes(String otherTimes) {
 		this.otherTimes = otherTimes;
+	}
+
+
+	public String getAddrbuid() {
+		return addrbuid;
+	}
+
+
+	public void setAddrbuid(String addrbuid) {
+		this.addrbuid = addrbuid;
+	}
+
+
+	public String getAddrrooom() {
+		return addrrooom;
+	}
+
+
+	public void setAddrrooom(String addrrooom) {
+		this.addrrooom = addrrooom;
 	}
 
 

@@ -8,6 +8,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -22,12 +23,9 @@ public class NettyServiceImp implements NettyService{
 	final int restartTime=10;
 	final NettyServiceImp service=this;
 	final int port=30000;
-		
+	Logger logger = Logger.getLogger(NettyServiceImp.class);
 	@Override
-	public void start() {
-		
-		System.out.println("NettyServiceStarting");
-		
+	public void start() {	
 		 try {
 	            ServerBootstrap b = new ServerBootstrap(); // (2)
 	            b.group(bossGroup, workerGroup)
@@ -35,14 +33,15 @@ public class NettyServiceImp implements NettyService{
 	             .childHandler(new ChannelInitializer<SocketChannel>() { // (4)
 	                 @Override
 	                 public void initChannel(SocketChannel ch) throws Exception {
-	                	 ch.pipeline().addFirst(new MyBufDecoder()); 
-	                	 //ch.pipeline().addLast(new SubOneHandler());
+	                	// ch.pipeline().addFirst(new MyBufDecoder()); 
+	                	 ch.pipeline().addLast(new MyBufDecoder(),new MyBufEncode());
 	                	 //ch.pipeline().addLast(new SubTwoHandler());  
 	                 }
 	             })
 	             .option(ChannelOption.SO_BACKLOG, 128)          // (5)
 	             .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)
 
+	            logger.info("netty started bind port: "+port);
 	            f = b.bind(port).sync(); 
 	          	f.channel().closeFuture().sync();
 	        } catch (InterruptedException e) {

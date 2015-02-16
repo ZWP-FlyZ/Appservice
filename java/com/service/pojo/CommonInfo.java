@@ -5,8 +5,9 @@ public class CommonInfo implements UserInfo{
 	    private String receiveFrom;
 	    private String sendTo;
 	    private String values;
+	    private String ov;
 	    
-	    public CommonInfo(String cmdKind, String receiveFrom, String sendTo){
+		public CommonInfo(String cmdKind, String receiveFrom, String sendTo){
 	    	this.cmdKind=cmdKind;
 	    	this.receiveFrom=receiveFrom;
 	    	this.sendTo=sendTo;
@@ -38,6 +39,12 @@ public class CommonInfo implements UserInfo{
 		public void setValues(String values) {
 			this.values = values;
 		}
-		
+		public String getOv() {
+			return ov;
+		}
+
+		public void setOv(String ov) {
+			this.ov = ov;
+		}
 	    
 }

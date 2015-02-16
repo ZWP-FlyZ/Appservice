@@ -21,7 +21,11 @@ public class MyChannelGroup implements ChannelGroupIntf{
 
 	@Override
 	public void close(String id) {
-		map.get(id).close();
+		Channel  channel=map.get(id);
+		if(channel!=null)
+		{
+			 channel.close();
+		}
 		map.remove(id);
 	}
 

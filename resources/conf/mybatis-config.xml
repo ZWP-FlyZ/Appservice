@@ -7,7 +7,14 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 <configuration>
         <!-- 命名空间 -->
     <typeAliases>
-         <typeAlias alias="Data" type="com.service.model.Data"/> 
+        <typeAlias alias="Data" type="com.service.model.Data"/>
+         <typeAlias alias="LogInData" type="com.service.model.LogInData"/> 
+          <typeAlias alias="PerDataLoc" type="com.service.model.PerDataLoc"/> 
+           <typeAlias alias="PerDataLocS" type="com.service.model.PerDataLocS"/> 
+            <typeAlias alias="PerDataRem" type="com.service.model.PerDataRem"/> 
+             <typeAlias alias="PerDataRemS" type="com.service.model.PerDataRemS"/>
+             <typeAlias alias="BsThemeData"  type="com.service.model.BsThemeData"/> 
+              <typeAlias alias="BsReplyData"  type="com.service.model.BsReplyData"/> 
     </typeAliases>
 
 	<!-- <environments default="development">

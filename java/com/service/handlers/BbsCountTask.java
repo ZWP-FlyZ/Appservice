@@ -8,11 +8,11 @@ import com.service.pojo.CommonInfo;
 import com.service.pojo.UserInfo;
 import com.service.system.SerSystem;
 
-public class DeleteBsTask  extends CommonTask {
+public class BbsCountTask extends CommonTask{
 
-	public DeleteBsTask(UserInfo info) {
+	public BbsCountTask(UserInfo info) {
 		super(info);
-		logger = Logger.getLogger(DeleteBsTask.class);
+		logger = Logger.getLogger(BbsCountTask.class);
 	}
 
 	@Override
@@ -21,17 +21,8 @@ public class DeleteBsTask  extends CommonTask {
 		try {
 			Channel channel = SerSystem.getChannelGroup().getChannel(commonInfo.getReceiveFrom());
 			if(channel!=null&&channel.isActive()){
-				int t = SerSystem.getLocalDbService().DeleteBs(info);
-				if(t>0){
-					SerSystem.getBsCount().cutCount(commonInfo.getValues());
-					commonInfo.setValues(null);
-					channel.writeAndFlush(commonInfo);
-				}
-				else if( t==0){
-					commonInfo.setValues(null);
-					channel.writeAndFlush(commonInfo);
-				}
-					
+				commonInfo.setValues(SerSystem.getBsCount().toString());
+				channel.writeAndFlush(commonInfo);	
 			}   
 			else
 			logger.warn("channel is null, non user ["+commonInfo.getReceiveFrom()+"] had login!");		
@@ -39,6 +30,7 @@ public class DeleteBsTask  extends CommonTask {
 			e.printStackTrace();
 			logger.debug(e);
 		}
+			
 	}
 
 }

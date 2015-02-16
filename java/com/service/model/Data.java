@@ -1,7 +1,7 @@
 package com.service.model;
 
 public class Data {
-		private Integer 	uId;
+		private Integer uId;
 		private String  mark;
 		public Integer getuId() {
 			return uId;
